@@ -9,6 +9,9 @@ public class BoardViewModel
     public int Cols { get; set; }
     public int TotalMines { get; set; }
     public GameStatus Status { get; set; } = GameStatus.InProgress;
+    public Difficulty Difficulty { get; set; }
+    public DateTime StartTime { get; set; } = DateTime.UtcNow;
+    public DateTime? EndTime { get; set; }
 
     public static BoardViewModel Create(GameSettingsViewModel settings)
     {
@@ -50,7 +53,15 @@ public class BoardViewModel
         foreach (var cell in nonMineCells)
             cell.AdjacentMines = GetNeighbors(grid, rows, cols, cell.Row, cell.Col).Count(c => c.IsMine);
 
-        return new BoardViewModel { Grid = grid, Rows = rows, Cols = cols, TotalMines = totalMines };
+        return new BoardViewModel
+        {
+            Grid = grid,
+            Rows = rows,
+            Cols = cols,
+            TotalMines = totalMines,
+            Difficulty = settings.Difficulty,
+            StartTime = DateTime.UtcNow
+        };
     }
 
     // flood fill - reveals all connected empty cells from the starting position

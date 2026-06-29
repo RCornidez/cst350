@@ -45,7 +45,33 @@ public class GameController : Controller
             return RedirectToAction("StartGame");
 
         _gameService.RevealCell(board, row, col);
-        return RedirectToAction("MineSweeperBoard");
+
+        return board.Status switch
+        {
+            GameStatus.Won  => RedirectToAction("GameWon"),
+            GameStatus.Lost => RedirectToAction("GameLost"),
+            _               => RedirectToAction("MineSweeperBoard")
+        };
+    }
+
+    public IActionResult GameWon()
+    {
+        var board = _gameService.GetBoard();
+        if (board == null)
+            return RedirectToAction("StartGame");
+
+        return View(_gameService.CalculateScore(board));
+    }
+
+    public IActionResult GameLost()
+    {
+        var board = _gameService.GetBoard();
+        if (board == null)
+            return RedirectToAction("StartGame");
+
+        var result = _gameService.CalculateScore(board);
+        result.Score = 0;
+        return View(result);
     }
 
     public IActionResult NewGame()

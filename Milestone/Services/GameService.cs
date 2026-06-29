@@ -41,7 +41,7 @@ namespace Milestone.Services {
                         c.IsRevealed = true;
 
                     board.Status = GameStatus.Lost;
-                    Console.WriteLine("Player hit a mine - game over.");
+                    board.EndTime = DateTime.UtcNow;
                 }
                 else
                 {
@@ -51,7 +51,7 @@ namespace Milestone.Services {
                     if (board.CheckWin())
                     {
                         board.Status = GameStatus.Won;
-                        Console.WriteLine("Player cleared the board - game won.");
+                        board.EndTime = DateTime.UtcNow;
                     }
                 }
             }
@@ -62,6 +62,36 @@ namespace Milestone.Services {
         public void ClearBoard()
         {
             Session.Remove(BoardSessionKey);
+        }
+
+        public GameResultViewModel CalculateScore(BoardViewModel board)
+        {
+            var end = board.EndTime ?? DateTime.UtcNow;
+            var elapsed = end - board.StartTime;
+            int elapsedSeconds = (int)elapsed.TotalSeconds;
+
+            int deduction = (elapsedSeconds / 20) * 5;
+            int baseScore = Math.Max(0, 500 - deduction);
+
+            int sizeMultiplier = board.Rows switch
+            {
+                5  => 2,
+                20 => 4,
+                _  => 3
+            };
+
+            int diffMultiplier = board.Difficulty switch
+            {
+                Difficulty.Easy => 2,
+                Difficulty.Hard => 4,
+                _               => 3
+            };
+
+            return new GameResultViewModel
+            {
+                Elapsed = elapsed,
+                Score = baseScore * sizeMultiplier * diffMultiplier
+            };
         }
     }
 }
