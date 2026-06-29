@@ -4007,11 +4007,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/rodrigo/workbench/school/cst350/milestones/milestone1/Milestone/Milestone.csproj",
+      "projectUniqueName": "/home/rodrigo/workbench/school/cst350/milestones/milestone2/Milestone/Milestone.csproj",
       "projectName": "Milestone",
-      "projectPath": "/home/rodrigo/workbench/school/cst350/milestones/milestone1/Milestone/Milestone.csproj",
+      "projectPath": "/home/rodrigo/workbench/school/cst350/milestones/milestone2/Milestone/Milestone.csproj",
       "packagesPath": "/home/rodrigo/.nuget/packages/",
-      "outputPath": "/home/rodrigo/workbench/school/cst350/milestones/milestone1/Milestone/obj/",
+      "outputPath": "/home/rodrigo/workbench/school/cst350/milestones/milestone2/Milestone/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/rodrigo/.nuget/NuGet/NuGet.Config"
@@ -4020,6 +4020,7 @@
         "net8.0"
       ],
       "sources": {
+        "/usr/lib/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -4032,7 +4033,13 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -4060,6 +4067,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.NETCore.App.Host.linux-x64",
+            "version": "[8.0.28, 8.0.28]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -4068,7 +4081,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.127/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.109/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

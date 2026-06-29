@@ -1,6 +1,104 @@
+@model Milestone.Models.GameSettingsViewModel
 @{
     ViewData["Title"] = "Start Game";
 }
 
-<h4>Start Game</h4>
-<hr />
+<style>
+    .option-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        border: 2px solid #dee2e6;
+        border-radius: 0.5rem;
+        background: white;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        min-width: 8rem;
+    }
+    .option-btn:hover {
+        border-color: #0d6efd;
+    }
+    .option-btn.selected {
+        border-color: #0d6efd;
+        background: #e7f0ff;
+    }
+    .option-btn .option-title {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    .option-btn .option-description {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.2rem;
+    }
+</style>
+
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 60vh;">
+    <h4 class="mb-4">New Game</h4>
+
+    <form asp-action="StartGame" method="post">
+        <input type="hidden" asp-for="Size" id="sizeInput" />
+        <input type="hidden" asp-for="Difficulty" id="diffInput" />
+
+        <div class="mb-4">
+            <p class="fw-semibold mb-2">Board Size</p>
+            <div class="d-flex flex-row gap-3">
+                <button type="button" class="option-btn" data-group="size" data-value="Small">
+                    <span class="option-title">Small</span>
+                    <span class="option-description">5 × 5</span>
+                </button>
+                <button type="button" class="option-btn" data-group="size" data-value="Medium">
+                    <span class="option-title">Medium</span>
+                    <span class="option-description">10 × 10</span>
+                </button>
+                <button type="button" class="option-btn" data-group="size" data-value="Large">
+                    <span class="option-title">Large</span>
+                    <span class="option-description">20 × 20</span>
+                </button>
+            </div>
+            <span asp-validation-for="Size" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-4">
+            <p class="fw-semibold mb-2">Difficulty</p>
+            <div class="d-flex flex-row gap-3">
+                <button type="button" class="option-btn" data-group="diff" data-value="Easy">
+                    <span class="option-title">Easy</span>
+                    <span class="option-description">10% mines</span>
+                </button>
+                <button type="button" class="option-btn" data-group="diff" data-value="Medium">
+                    <span class="option-title">Medium</span>
+                    <span class="option-description">20% mines</span>
+                </button>
+                <button type="button" class="option-btn" data-group="diff" data-value="Hard">
+                    <span class="option-title">Hard</span>
+                    <span class="option-description">30% mines</span>
+                </button>
+            </div>
+            <span asp-validation-for="Difficulty" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Start Game</button>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+    function initGroup(group, hiddenId, defaultValue) {
+        const hidden = document.getElementById(hiddenId);
+        const btns = document.querySelectorAll(`[data-group="${group}"]`);
+
+        function select(value) {
+            hidden.value = value;
+            btns.forEach(b => b.classList.toggle('selected', b.dataset.value === value));
+        }
+
+        btns.forEach(b => b.addEventListener('click', () => select(b.dataset.value)));
+        select(defaultValue);
+    }
+
+    initGroup('size', 'sizeInput', '@Model.Size');
+    initGroup('diff', 'diffInput', '@Model.Difficulty');
+</script>
+}

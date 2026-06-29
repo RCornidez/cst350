@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mhXJG+/dFr1JCV7HoqP7LkOSpm406yPt/Iil6fAL7vO1KCo5bb49yLUlYzxXI2zw/KFvsK3HT55q4O+GgUA6VA==",
+  "dgSpecHash": "lYkaIaS1cVM=",
   "success": true,
-  "projectFilePath": "/home/rodrigo/workbench/school/cst350/milestones/milestone1/Milestone/Milestone.csproj",
+  "projectFilePath": "/home/rodrigo/workbench/school/cst350/milestones/milestone2/Milestone/Milestone.csproj",
   "expectedPackageFiles": [
     "/home/rodrigo/.nuget/packages/azure.core/1.38.0/azure.core.1.38.0.nupkg.sha512",
     "/home/rodrigo/.nuget/packages/azure.identity/1.11.4/azure.identity.1.11.4.nupkg.sha512",
@@ -79,7 +79,8 @@
     "/home/rodrigo/.nuget/packages/system.text.json/4.7.2/system.text.json.4.7.2.nupkg.sha512",
     "/home/rodrigo/.nuget/packages/system.threading.channels/6.0.0/system.threading.channels.6.0.0.nupkg.sha512",
     "/home/rodrigo/.nuget/packages/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg.sha512",
-    "/home/rodrigo/.nuget/packages/system.windows.extensions/6.0.0/system.windows.extensions.6.0.0.nupkg.sha512"
+    "/home/rodrigo/.nuget/packages/system.windows.extensions/6.0.0/system.windows.extensions.6.0.0.nupkg.sha512",
+    "/home/rodrigo/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.28/microsoft.netcore.app.host.linux-x64.8.0.28.nupkg.sha512"
   ],
   "logs": []
 }

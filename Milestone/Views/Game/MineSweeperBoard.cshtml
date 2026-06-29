@@ -1,0 +1,67 @@
+@model Milestone.Models.BoardViewModel
+@{
+    ViewData["Title"] = "Minesweeper";
+}
+
+<style>
+    .board {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 0;
+    }
+    .board-row {
+        display: flex;
+        flex-direction: row;
+        gap: 0;
+    }
+    .cell-btn {
+        width: 60px;
+        height: 60px;
+        padding: 0;
+        border: 1px solid #999;
+        background: none;
+        cursor: pointer;
+    }
+    .cell-btn img {
+        width: 60px;
+        height: 60px;
+        display: block;
+    }
+</style>
+
+<div class="d-flex flex-column align-items-center mt-4">
+    <h4 class="mb-3">Minesweeper</h4>
+
+    <div class="d-flex gap-2 mb-3">
+        <a asp-controller="Game" asp-action="NewGame" class="btn btn-secondary">New Game</a>
+        <a asp-controller="Game" asp-action="Exit" class="btn btn-danger">Exit</a>
+    </div>
+
+    <div class="board">
+        @foreach (var row in Model.Grid)
+        {
+            <div class="board-row">
+                @foreach (var cell in row)
+                {
+                    string image;
+                    if (cell.IsFlagged)
+                        image = "flag";
+                    else if (!cell.IsRevealed)
+                        image = "unexplored";
+                    else if (cell.IsMine)
+                        image = "mine_hit";
+                    else
+                        image = cell.AdjacentMines.ToString();
+
+                    <form asp-action="RevealCell" method="post" style="margin:0;">
+                        <input type="hidden" name="row" value="@cell.Row" />
+                        <input type="hidden" name="col" value="@cell.Col" />
+                        <button type="submit" class="cell-btn">
+                            <img src="~/images/@(image).png" alt="@image" />
+                        </button>
+                    </form>
+                }
+            </div>
+        }
+    </div>
+</div>
