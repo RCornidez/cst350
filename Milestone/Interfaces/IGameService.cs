@@ -5,7 +5,8 @@ namespace Milestone.Interfaces {
     {
         BoardViewModel? GetBoard();
         BoardViewModel CreateBoard(GameSettingsViewModel settings);
-        void RevealCell(BoardViewModel board, int row, int col);
+        List<Cell> RevealCell(BoardViewModel board, int row, int col);
+        List<Cell> ToggleFlag(BoardViewModel board, int row, int col);
         void ClearBoard();
         GameResultViewModel CalculateScore(BoardViewModel board);
     }

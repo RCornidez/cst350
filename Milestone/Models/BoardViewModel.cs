@@ -64,9 +64,9 @@ public class BoardViewModel
         };
     }
 
-    // flood fill - reveals all connected empty cells from the starting position
-    public void FloodFill(int startRow, int startCol)
+    public List<Cell> FloodFill(int startRow, int startCol)
     {
+        var revealed = new List<Cell>();
         var queue = new Queue<Cell>();
         queue.Enqueue(Grid[startRow][startCol]);
 
@@ -80,11 +80,14 @@ public class BoardViewModel
                     continue;
 
                 neighbor.IsRevealed = true;
+                revealed.Add(neighbor);
 
                 if (neighbor.AdjacentMines == 0)
                     queue.Enqueue(neighbor);
             }
         }
+
+        return revealed;
     }
 
     public bool CheckWin()

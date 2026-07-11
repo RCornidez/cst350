@@ -27,18 +27,23 @@ namespace Milestone.Services {
             return board;
         }
 
-        public void RevealCell(BoardViewModel board, int row, int col)
+        public List<Cell> RevealCell(BoardViewModel board, int row, int col)
         {
+            var changed = new List<Cell>();
             var cell = board.Grid[row][col];
 
             if (!cell.IsRevealed && !cell.IsFlagged && board.Status == GameStatus.InProgress)
             {
                 cell.IsRevealed = true;
+                changed.Add(cell);
 
                 if (cell.IsMine)
                 {
-                    foreach (var c in board.Grid.SelectMany(r => r).Where(c => c.IsMine))
+                    foreach (var c in board.Grid.SelectMany(r => r).Where(c => c.IsMine && !c.IsRevealed))
+                    {
                         c.IsRevealed = true;
+                        changed.Add(c);
+                    }
 
                     board.Status = GameStatus.Lost;
                     board.EndTime = DateTime.UtcNow;
@@ -46,7 +51,7 @@ namespace Milestone.Services {
                 else
                 {
                     if (cell.AdjacentMines == 0)
-                        board.FloodFill(row, col);
+                        changed.AddRange(board.FloodFill(row, col));
 
                     if (board.CheckWin())
                     {
@@ -57,6 +62,22 @@ namespace Milestone.Services {
             }
 
             Session.SetString(BoardSessionKey, JsonSerializer.Serialize(board));
+            return changed;
+        }
+
+        public List<Cell> ToggleFlag(BoardViewModel board, int row, int col)
+        {
+            var changed = new List<Cell>();
+            var cell = board.Grid[row][col];
+
+            if (!cell.IsRevealed && board.Status == GameStatus.InProgress)
+            {
+                cell.IsFlagged = !cell.IsFlagged;
+                changed.Add(cell);
+                Session.SetString(BoardSessionKey, JsonSerializer.Serialize(board));
+            }
+
+            return changed;
         }
 
         public void ClearBoard()

@@ -37,31 +37,76 @@
         <a asp-controller="Game" asp-action="Exit" class="btn btn-danger">Exit</a>
     </div>
 
+    <p class="text-muted small mb-2">Last AJAX update: <span id="ajax-timestamp">none yet</span></p>
+
     <div class="board">
         @foreach (var row in Model.Grid)
         {
             <div class="board-row">
                 @foreach (var cell in row)
                 {
-                    string image;
-                    if (cell.IsFlagged)
-                        image = "flag";
-                    else if (!cell.IsRevealed)
-                        image = "unexplored";
-                    else if (cell.IsMine)
-                        image = "mine_hit";
-                    else
-                        image = cell.AdjacentMines.ToString();
-
-                    <form asp-action="RevealCell" method="post" style="margin:0;">
-                        <input type="hidden" name="row" value="@cell.Row" />
-                        <input type="hidden" name="col" value="@cell.Col" />
-                        <button type="submit" class="cell-btn">
-                            <img src="~/images/@(image).png" alt="@image" />
-                        </button>
-                    </form>
+                    @await Html.PartialAsync("_CellPartial", cell)
                 }
             </div>
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            var $board = $('.board');
+
+            // Swap each changed cell's button for the partial HTML
+            function updateCells(cells) {
+                cells.forEach(function (cell) {
+                    $('#cell-' + cell.row + '-' + cell.col).replaceWith(cell.html);
+                });
+            }
+
+            function updateTimestamp(timestamp) {
+                $('#ajax-timestamp').text(timestamp);
+            }
+
+            // Left click: reveal the cell via AJAX instead of posting/reloading the whole page.
+            $board.on('click', '.cell-btn', function () {
+                var $btn = $(this);
+
+                // flagged cells ignore left-click
+                if ($btn.data('flagged') === true) return;
+
+                $.post('@Url.Action("RevealCell")', {
+                    row: $btn.data('row'),
+                    col: $btn.data('col')
+                }, function (data) {
+                    updateCells(data.cells);
+                    updateTimestamp(data.timestamp);
+
+                    // Game logic win/loss is decided server-side
+                    if (data.status === 'Won') window.location.href = '@Url.Action("GameWon")';
+                    else if (data.status === 'Lost') window.location.href = '@Url.Action("GameLost")';
+                });
+            });
+
+            // Right click: toggle a flag via AJAX instead of revealing the cell.
+            $board.on('contextmenu', '.cell-btn', function (e) {
+                e.preventDefault(); // suppress the browser context menu
+
+                var $btn = $(this);
+
+                // can't flag an already-revealed cell
+                if ($btn.data('revealed') === true) return false; 
+
+                $.post('@Url.Action("ToggleFlag")', {
+                    row: $btn.data('row'),
+                    col: $btn.data('col')
+                }, function (data) {
+                    updateCells(data.cells);
+                    updateTimestamp(data.timestamp);
+                });
+
+                return false;
+            });
+        });
+    </script>
+}

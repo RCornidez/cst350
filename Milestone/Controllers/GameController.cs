@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Milestone.Extensions;
 using Milestone.Interfaces;
 using Milestone.Models;
 
@@ -38,20 +39,48 @@ public class GameController : Controller
     }
 
     [HttpPost]
-    public IActionResult RevealCell(int row, int col)
+    public async Task<IActionResult> RevealCell(int row, int col)
     {
         var board = _gameService.GetBoard();
         if (board == null)
-            return RedirectToAction("StartGame");
+            return NotFound();
 
-        _gameService.RevealCell(board, row, col);
+        var changed = _gameService.RevealCell(board, row, col);
 
-        return board.Status switch
+        return await CellUpdateResult(changed, board.Status);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ToggleFlag(int row, int col)
+    {
+        var board = _gameService.GetBoard();
+        if (board == null)
+            return NotFound();
+
+        var changed = _gameService.ToggleFlag(board, row, col);
+
+        return await CellUpdateResult(changed, board.Status);
+    }
+
+    private async Task<IActionResult> CellUpdateResult(List<Cell> changed, GameStatus status)
+    {
+        var cells = new List<object>();
+        foreach (var cell in changed)
         {
-            GameStatus.Won  => RedirectToAction("GameWon"),
-            GameStatus.Lost => RedirectToAction("GameLost"),
-            _               => RedirectToAction("MineSweeperBoard")
-        };
+            cells.Add(new
+            {
+                row = cell.Row,
+                col = cell.Col,
+                html = await this.RenderPartialViewToStringAsync("_CellPartial", cell)
+            });
+        }
+
+        return Json(new
+        {
+            status = status.ToString(),
+            timestamp = DateTime.Now.ToString("HH:mm:ss"),
+            cells
+        });
     }
 
     public IActionResult GameWon()

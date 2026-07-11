@@ -1,0 +1,23 @@
+@model Milestone.Models.Cell
+@{
+    // Single source of truth for a cell's look, shared by the initial board render and every AJAX update.
+    string image;
+    if (Model.IsFlagged)
+        image = "flag";
+    else if (!Model.IsRevealed)
+        image = "unexplored";
+    else if (Model.IsMine)
+        image = "mine_hit"; // only reached once a mine has been revealed (loss)
+    else
+        image = Model.AdjacentMines.ToString();
+}
+<button type="button"
+        id="cell-@(Model.Row)-@(Model.Col)"
+        class="cell-btn"
+        data-row="@Model.Row"
+        data-col="@Model.Col"
+        data-flagged="@Model.IsFlagged.ToString().ToLowerInvariant()"
+        data-revealed="@Model.IsRevealed.ToString().ToLowerInvariant()">
+    @* data-flagged/data-revealed let the client-side handlers gate clicks without a round trip. *@
+    <img src="~/images/@(image).png" alt="@image" />
+</button>
