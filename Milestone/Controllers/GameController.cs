@@ -14,6 +14,8 @@ public class GameController : Controller
         _gameService = gameService;
     }
 
+    private int UserId => HttpContext.Session.GetInt32("UserId")!.Value;
+
     public IActionResult StartGame()
     {
         return View(new GameSettingsViewModel());
@@ -107,6 +109,40 @@ public class GameController : Controller
     {
         _gameService.ClearBoard();
         return RedirectToAction("StartGame");
+    }
+
+    [HttpPost]
+    public IActionResult SaveGame()
+    {
+        var board = _gameService.GetBoard();
+        if (board == null)
+            return RedirectToAction("StartGame");
+
+        _gameService.SaveGame(UserId, board);
+        TempData["Message"] = "Game saved.";
+        return RedirectToAction("MineSweeperBoard");
+    }
+
+    public IActionResult SavedGames()
+    {
+        return View(_gameService.GetSavedGameRows(UserId));
+    }
+
+    public IActionResult LoadGame(int id)
+    {
+        if (!_gameService.LoadGame(id, UserId))
+            return NotFound();
+
+        return RedirectToAction("MineSweeperBoard");
+    }
+
+    [HttpPost]
+    public IActionResult DeleteGame(int id)
+    {
+        if (!_gameService.DeleteGameForUser(id, UserId))
+            return NotFound();
+
+        return RedirectToAction("SavedGames");
     }
 
     public IActionResult Exit()

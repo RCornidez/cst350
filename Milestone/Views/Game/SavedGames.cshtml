@@ -1,0 +1,54 @@
+@model List<Milestone.Models.SavedGameRowViewModel>
+@{
+    ViewData["Title"] = "Saved Games";
+}
+
+<div class="d-flex flex-column align-items-center mt-4">
+    <h4 class="mb-3">Saved Games</h4>
+
+    <div class="d-flex gap-2 mb-3">
+        <a asp-controller="Game" asp-action="MineSweeperBoard" class="btn btn-secondary">Back to Game</a>
+        <a asp-controller="Game" asp-action="StartGame" class="btn btn-primary">New Game</a>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <p class="text-muted">You have no saved games yet.</p>
+    }
+    else
+    {
+        <table class="table table-striped w-auto align-middle">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Date Saved</th>
+                    <th>Board</th>
+                    <th>Difficulty</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var game in Model)
+                {
+                    <tr>
+                        <td>@game.Id</td>
+                        <td>@game.DateSaved.ToLocalTime().ToString("g")</td>
+                        <td>@game.Rows × @game.Cols</td>
+                        <td>@game.Difficulty</td>
+                        <td>@game.Status</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a asp-action="LoadGame" asp-route-id="@game.Id" class="btn btn-sm btn-success">Load</a>
+                                <form asp-action="DeleteGame" asp-route-id="@game.Id" method="post"
+                                      onsubmit="return confirm('Delete saved game #@game.Id?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

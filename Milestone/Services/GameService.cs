@@ -1,3 +1,4 @@
+using Milestone.Data;
 using Milestone.Interfaces;
 using Milestone.Models;
 using System.Text.Json;
@@ -7,11 +8,13 @@ namespace Milestone.Services {
     {
         private const string BoardSessionKey = "GameBoard";
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AppDbContext _db;
         private ISession Session => _httpContextAccessor.HttpContext!.Session;
 
-        public GameService(IHttpContextAccessor httpContextAccessor)
+        public GameService(IHttpContextAccessor httpContextAccessor, AppDbContext db)
         {
             _httpContextAccessor = httpContextAccessor;
+            _db = db;
         }
 
         public BoardViewModel? GetBoard()
@@ -25,6 +28,11 @@ namespace Milestone.Services {
             var board = BoardViewModel.Create(settings);
             Session.SetString(BoardSessionKey, JsonSerializer.Serialize(board));
             return board;
+        }
+
+        public void SetBoard(BoardViewModel board)
+        {
+            Session.SetString(BoardSessionKey, JsonSerializer.Serialize(board));
         }
 
         public List<Cell> RevealCell(BoardViewModel board, int row, int col)
@@ -83,6 +91,74 @@ namespace Milestone.Services {
         public void ClearBoard()
         {
             Session.Remove(BoardSessionKey);
+        }
+
+        public SavedGameModel SaveGame(int userId, BoardViewModel board)
+        {
+            var game = new SavedGameModel
+            {
+                UserId = userId,
+                DateSaved = DateTime.UtcNow,
+                GameData = JsonSerializer.Serialize(board)
+            };
+
+            _db.Games.Add(game);
+            _db.SaveChanges();
+            return game;
+        }
+
+        public List<SavedGameModel> GetGamesForUser(int userId) =>
+            _db.Games
+                .Where(g => g.UserId == userId)
+                .OrderByDescending(g => g.DateSaved)
+                .ToList();
+
+        public List<SavedGameRowViewModel> GetSavedGameRows(int userId) =>
+            GetGamesForUser(userId)
+                .Select(game =>
+                {
+                    var board = JsonSerializer.Deserialize<BoardViewModel>(game.GameData)!;
+                    return new SavedGameRowViewModel
+                    {
+                        Id = game.Id,
+                        DateSaved = game.DateSaved,
+                        Rows = board.Rows,
+                        Cols = board.Cols,
+                        Difficulty = board.Difficulty,
+                        Status = board.Status
+                    };
+                })
+                .ToList();
+
+        public SavedGameModel? GetGameForUser(int id, int userId)
+        {
+            var game = _db.Games.Find(id);
+            return game?.UserId == userId ? game : null;
+        }
+
+        public bool LoadGame(int id, int userId)
+        {
+            var game = GetGameForUser(id, userId);
+            if (game == null)
+                return false;
+
+            var board = JsonSerializer.Deserialize<BoardViewModel>(game.GameData);
+            if (board == null)
+                return false;
+
+            SetBoard(board);
+            return true;
+        }
+
+        public bool DeleteGameForUser(int id, int userId)
+        {
+            var game = GetGameForUser(id, userId);
+            if (game == null)
+                return false;
+
+            _db.Games.Remove(game);
+            _db.SaveChanges();
+            return true;
         }
 
         public GameResultViewModel CalculateScore(BoardViewModel board)
